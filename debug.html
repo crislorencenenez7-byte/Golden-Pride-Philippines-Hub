@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Golden Pride Hub — Firebase Diagnostic</title>
+  <style>
+    body {
+      font-family: -apple-system, Arial, sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #ffd700; font-size: 1.3rem; }
+    .step {
+      background: #1c1c1c;
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .pending { color: #a3a3a3; }
+    .ok { color: #4ade80; font-weight: bold; }
+    .fail { color: #f87171; font-weight: bold; }
+    .detail {
+      font-size: 0.82rem;
+      color: #ccc;
+      margin-top: 6px;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    button {
+      background: #ffd700;
+      color: #0d0d0d;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔎 Golden Pride Hub — Firebase Diagnostic</h1>
+  <p style="color:#a3a3a3; font-size:0.9rem;">Pinipindot mo lang ang button sa baba. Lalabas dito mismo sa screen kung saan talaga nasusukol.</p>
+
+  <button id="run-btn">Patakbuhin ang Test</button>
+
+  <div id="results" style="margin-top:20px;"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <!-- IMPORTANT: same config as js/firebase-config.js -->
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    const results = document.getElementById("results");
+
+    function addStep(label) {
+      const div = document.createElement("div");
+      div.className = "step";
+      div.innerHTML = `<span class="pending">⏳ ${label}…</span>`;
+      results.appendChild(div);
+      return div;
+    }
+
+    function pass(div, label, detail = "") {
+      div.innerHTML = `<span class="ok">✅ ${label}</span>` + (detail ? `<div class="detail">${detail}</div>` : "");
+    }
+
+    function fail(div, label, detail = "") {
+      div.innerHTML = `<span class="fail">❌ ${label}</span>` + (detail ? `<div class="detail">${detail}</div>` : "");
+    }
+
+    document.getElementById("run-btn").addEventListener("click", async () => {
+      results.innerHTML = "";
+
+      // Step 1: Firebase App Init
+      const step1 = addStep("Step 1: Firebase App Initialization");
+      try {
+        firebase.app();
+        pass(step1, "Firebase App OK", "Project ID: " + firebase.app().options.projectId);
+      } catch (err) {
+        fail(step1, "Firebase App FAILED", err.message);
+        return;
+      }
+
+      // Step 2: Auth Service
+      const step2 = addStep("Step 2: Authentication Service");
+      let testUser;
+      try {
+        const testEmail = `diagnostic_${Date.now()}@test.com`;
+        const cred = await firebase.auth().createUserWithEmailAndPassword(testEmail, "Test123456");
+        testUser = cred.user;
+        pass(step2, "Test account created OK", "UID: " + testUser.uid);
+      } catch (err) {
+        fail(step2, "Auth FAILED", "Code: " + err.code + "\nMessage: " + err.message);
+        return;
+      }
+
+      // Step 3: Firestore Write
+      const step3 = addStep("Step 3: Firestore Write (users collection)");
+      try {
+        await firebase.firestore().collection("users").doc(testUser.uid).set({
+          uid: testUser.uid,
+          fullname: "Diagnostic Test",
+          email: testUser.email,
+          role: "member",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        pass(step3, "Firestore WRITE SUCCESS", "Nasave sa 'users' collection! Puntahan mo ang Firestore Console para makita.");
+      } catch (err) {
+        fail(step3, "Firestore WRITE FAILED — ITO ANG PROBLEMA", "Code: " + err.code + "\nMessage: " + err.message);
+      }
+
+      // Step 4: Firestore Read
+      const step4 = addStep("Step 4: Firestore Read-back");
+      try {
+        const doc = await firebase.firestore().collection("users").doc(testUser.uid).get();
+        if (doc.exists) {
+          pass(step4, "Firestore READ SUCCESS", "Data: " + JSON.stringify(doc.data()));
+        } else {
+          fail(step4, "Document hindi nakita pagkatapos i-save", "Posibleng write silently failed.");
+        }
+      } catch (err) {
+        fail(step4, "Firestore READ FAILED", "Code: " + err.code + "\nMessage: " + err.message);
+      }
+
+      // Cleanup note
+      const cleanup = addStep("Cleanup Note");
+      cleanup.innerHTML = `<span class="pending">ℹ️ Gumawa ng test account: ${testUser.email} — pwede mo itong i-delete sa Authentication → Users kung gusto mo.</span>`;
+    });
+  </script>
+</body>
+</html>
