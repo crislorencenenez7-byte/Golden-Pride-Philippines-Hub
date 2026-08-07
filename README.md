@@ -83,6 +83,12 @@ service cloud.firestore {
     match /events/{docId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
+
+      match /rsvps/{uid} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && request.auth.uid == uid;
+        allow delete: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      }
     }
 
     match /gallery/{docId} {
@@ -114,10 +120,14 @@ New accounts register with role `member` by default. To make yourself an admin:
 - Email/password auth with email verification, Remember Me, auto-login, and route protection
 - Role-based access (Admin / Member) enforced both in the UI and Firestore rules
 - Full CRUD for Announcements, Events, Gallery, and Achievements (admin only)
+- **Event RSVP/Attendance** — members can RSVP to upcoming events; admins can view the full attendee list per event from the Admin Panel
+- **Online/Offline presence** — members list shows a live green/gray dot based on a Firestore heartbeat (updates roughly every 60s; a member is shown offline after ~2 minutes of inactivity)
+- **In-app notifications** — a bell icon shows unread announcement count in real time, with an optional browser desktop notification if the member grants permission. This works while the browser tab is open (including in the background) but **cannot** deliver notifications when the browser is fully closed — true "push while closed" requires Firebase Cloud Messaging + a Cloud Function on the paid Blaze plan
 - Search, filter, and pagination on Announcements; search on Members
 - Responsive glassmorphism UI with dark mode aesthetic, mobile navigation, and scroll-to-top
 - Toast notifications and confirmation dialogs for all destructive actions
-- Profile editing with picture upload (stored as compressed base64 in Firestore — swap in Firebase Storage for production use at scale)
+- Profile editing with picture upload; Gallery/Announcement/Achievement images also upload directly as files (stored as compressed base64 in Firestore, capped at 700KB — swap in Firebase Storage for production use at scale)
+- Installable as a Progressive Web App (PWA) — "Add to Home Screen" on mobile, or package via [PWABuilder](https://www.pwabuilder.com) for an Android APK
 
 ## 📝 Notes
 - All user input is sanitized before rendering to prevent basic XSS.
