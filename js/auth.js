@@ -30,7 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (authMode === "guest" && user) {
+    // Skip the guest redirect while a registration is actively in progress —
+    // otherwise the auth-state change fired by createUserWithEmailAndPassword()
+    // redirects to dashboard.html before the Firestore write / email
+    // verification below has a chance to finish.
+    if (authMode === "guest" && user && !window.__registrationInProgress) {
       window.location.href = "dashboard.html";
     }
   });
@@ -63,6 +67,7 @@ if (registerForm) {
 
     submitBtn.disabled = true;
     submitBtn.classList.add("btn-loading");
+    window.__registrationInProgress = true;
 
     try {
       const cred = await auth.createUserWithEmailAndPassword(email, password);
@@ -78,6 +83,10 @@ if (registerForm) {
       await cred.user.updateProfile({ displayName: fullname });
       await cred.user.sendEmailVerification();
 
+      // Sign the new user out immediately — they must verify their email
+      // and log in explicitly before entering the app.
+      await auth.signOut();
+
       showToast("Account created! Please check your email to verify.", "success");
       setTimeout(() => (window.location.href = "login.html"), 1500);
     } catch (err) {
@@ -85,6 +94,7 @@ if (registerForm) {
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove("btn-loading");
+      window.__registrationInProgress = false;
     }
   });
 }
@@ -179,4 +189,5 @@ function friendlyAuthError(err) {
     "auth/too-many-requests": "Too many attempts. Please try again later."
   };
   return map[err.code] || err.message || "Something went wrong. Please try again.";
-}
+         }
+       
