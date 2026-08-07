@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Golden Pride Hub</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="auth-page" data-auth="guest">
+
+  <div id="loading-screen"><div class="spinner"></div></div>
+
+  <div class="auth-box glass fade-in">
+    <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+
+    <div class="auth-logo">
+      <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <span>Golden Pride <span class="text-gold">Hub</span></span>
+    </div>
+
+    <h2>Create Account</h2>
+    <p class="auth-subtitle">Join the Golden Pride community</p>
+
+    <form id="register-form" novalidate>
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="fullname" required placeholder="Juan Dela Cruz">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" required placeholder="At least 6 characters">
+          <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Confirm Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="confirm-password" required placeholder="Re-enter password">
+          <i class="fa-solid fa-eye toggle-password" data-target="confirm-password"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-user-plus"></i> Register
+      </button>
+    </form>
+
+    <p class="auth-footer">Already have an account? <a href="login.html">Log in here</a></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.querySelectorAll(".toggle-password").forEach((icon) => {
+      icon.addEventListener("click", () => {
+        const input = document.getElementById(icon.dataset.target);
+        input.type = input.type === "password" ? "text" : "password";
+        icon.classList.toggle("fa-eye");
+        icon.classList.toggle("fa-eye-slash");
+      });
+    });
+  </script>
+</body>
+</html>

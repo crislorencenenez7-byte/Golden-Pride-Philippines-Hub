@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Announcements | Golden Pride Hub</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body data-auth="required">
+
+  <div id="loading-screen"><div class="spinner"></div></div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>Golden Pride Hub</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="announcements.html" class="active"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+        <a href="members.html"><i class="fa-solid fa-users"></i> Members</a>
+        <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+        <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar-circle user-avatar-initials"></div>
+        <div class="sidebar-user-info">
+          <span class="user-fullname">Loading…</span>
+          <span class="user-role-badge badge-member"></span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="topbar">
+        <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
+        <h1>Announcements</h1>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="announcement-search" placeholder="Search announcements…">
+        </div>
+        <select id="announcement-filter" class="select-filter">
+          <option value="">All Authors</option>
+        </select>
+      </div>
+
+      <div id="announcements-list" class="grid grid-3"></div>
+      <div id="announcements-pagination" class="pagination"></div>
+    </main>
+  </div>
+
+  <button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/announcements.js"></script>
+</body>
+</html>

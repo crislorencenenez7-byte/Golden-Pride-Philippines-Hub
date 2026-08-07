@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Golden Pride Hub</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body data-auth="required">
+
+  <div id="loading-screen"><div class="spinner"></div></div>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>Golden Pride Hub</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="announcements.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+        <a href="members.html"><i class="fa-solid fa-users"></i> Members</a>
+        <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+        <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar-circle user-avatar-initials"></div>
+        <div class="sidebar-user-info">
+          <span class="user-fullname">Loading…</span>
+          <span class="user-role-badge badge-member"></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="topbar">
+        <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
+        <h1>Welcome, <span class="text-gold user-fullname">Member</span> 👋</h1>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+          <div><div class="stat-value" id="stat-announcements">0</div><div class="stat-label">Announcements</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div><div class="stat-value" id="stat-members">0</div><div class="stat-label">Members</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <div><div class="stat-value" id="stat-events">0</div><div class="stat-label">Events</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
+          <div><div class="stat-value" id="stat-gallery">0</div><div class="stat-label">Gallery Items</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+          <div><div class="stat-value" id="stat-achievements">0</div><div class="stat-label">Achievements</div></div>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="font-size:1.3rem;">Quick Links</h2>
+      <div class="dashboard-links" style="margin-bottom: 36px;">
+        <a href="announcements.html" class="dashboard-link-card glass card"><i class="fa-solid fa-bullhorn"></i><h4>Announcements</h4></a>
+        <a href="members.html" class="dashboard-link-card glass card"><i class="fa-solid fa-users"></i><h4>Members</h4></a>
+        <a href="events.html" class="dashboard-link-card glass card"><i class="fa-solid fa-calendar-days"></i><h4>Events</h4></a>
+        <a href="gallery.html" class="dashboard-link-card glass card"><i class="fa-solid fa-images"></i><h4>Gallery</h4></a>
+        <a href="achievements.html" class="dashboard-link-card glass card"><i class="fa-solid fa-trophy"></i><h4>Achievements</h4></a>
+      </div>
+
+      <h2 class="section-title" style="font-size:1.3rem;">Latest Announcement</h2>
+      <div id="latest-announcement" class="grid grid-3"></div>
+    </main>
+  </div>
+
+  <button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

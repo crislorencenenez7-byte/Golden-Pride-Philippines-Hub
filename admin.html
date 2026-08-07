@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | Golden Pride Hub</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<!-- data-auth="admin" restricts this page to users with role "admin" -->
+<body data-auth="admin" class="admin-page">
+
+  <div id="loading-screen"><div class="spinner"></div></div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>Golden Pride Hub</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="announcements.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+        <a href="members.html"><i class="fa-solid fa-users"></i> Members</a>
+        <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="admin.html" class="active admin-only"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+        <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar-circle user-avatar-initials"></div>
+        <div class="sidebar-user-info">
+          <span class="user-fullname">Loading…</span>
+          <span class="user-role-badge badge-member"></span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="topbar">
+        <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
+        <h1>Admin Panel</h1>
+      </div>
+
+      <!-- Statistics -->
+      <div class="stats-grid">
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div><div class="stat-value" id="admin-stat-users">0</div><div class="stat-label">Total Members</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+          <div><div class="stat-value" id="admin-stat-announcements">0</div><div class="stat-label">Announcements</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <div><div class="stat-value" id="admin-stat-events">0</div><div class="stat-label">Events</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
+          <div><div class="stat-value" id="admin-stat-gallery">0</div><div class="stat-label">Gallery Items</div></div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+          <div><div class="stat-value" id="admin-stat-achievements">0</div><div class="stat-label">Achievements</div></div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-target="tab-announcements">Announcements</button>
+        <button class="admin-tab" data-target="tab-users">Members</button>
+        <button class="admin-tab" data-target="tab-events">Events</button>
+        <button class="admin-tab" data-target="tab-gallery">Gallery</button>
+        <button class="admin-tab" data-target="tab-achievements">Achievements</button>
+      </div>
+
+      <!-- Announcements Tab -->
+      <section id="tab-announcements" class="admin-panel active">
+        <div class="admin-layout">
+          <form id="announcement-form" class="admin-form-card glass">
+            <h3><i class="fa-solid fa-bullhorn text-gold"></i> Post Announcement</h3>
+            <input type="hidden" id="announcement-id">
+            <div class="form-group">
+              <label for="announcement-title">Title</label>
+              <input type="text" id="announcement-title" required>
+            </div>
+            <div class="form-group">
+              <label for="announcement-content">Content</label>
+              <textarea id="announcement-content" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="announcement-image">Image URL (optional)</label>
+              <input type="url" id="announcement-image" placeholder="https://…">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-paper-plane"></i> Publish
+            </button>
+          </form>
+
+          <div class="table-card glass">
+            <table class="data-table">
+              <thead>
+                <tr><th>Title</th><th>Author</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="admin-announcements-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users Tab -->
+      <section id="tab-users" class="admin-panel">
+        <div class="table-card glass">
+          <table class="data-table">
+            <thead>
+              <tr><th>Full Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="admin-users-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Events Tab -->
+      <section id="tab-events" class="admin-panel">
+        <div class="admin-layout">
+          <form id="event-form" class="admin-form-card glass">
+            <h3><i class="fa-solid fa-calendar-days text-gold"></i> Add Event</h3>
+            <div class="form-group">
+              <label for="event-title">Title</label>
+              <input type="text" id="event-title" required>
+            </div>
+            <div class="form-group">
+              <label for="event-description">Description</label>
+              <textarea id="event-description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="event-location">Location</label>
+              <input type="text" id="event-location">
+            </div>
+            <div class="form-group">
+              <label for="event-date">Date &amp; Time</label>
+              <input type="datetime-local" id="event-date" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-plus"></i> Add Event
+            </button>
+          </form>
+
+          <div class="table-card glass">
+            <table class="data-table">
+              <thead>
+                <tr><th>Title</th><th>Location</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="admin-events-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery Tab -->
+      <section id="tab-gallery" class="admin-panel">
+        <div class="admin-layout">
+          <form id="gallery-form" class="admin-form-card glass">
+            <h3><i class="fa-solid fa-images text-gold"></i> Upload Photo</h3>
+            <div class="form-group">
+              <label for="gallery-image">Image URL</label>
+              <input type="url" id="gallery-image" required placeholder="https://…">
+            </div>
+            <div class="form-group">
+              <label for="gallery-caption">Caption</label>
+              <input type="text" id="gallery-caption">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-upload"></i> Upload
+            </button>
+          </form>
+
+          <div class="table-card glass">
+            <table class="data-table">
+              <thead>
+                <tr><th>Photo</th><th>Caption</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="admin-gallery-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Achievements Tab -->
+      <section id="tab-achievements" class="admin-panel">
+        <div class="admin-layout">
+          <form id="achievement-form" class="admin-form-card glass">
+            <h3><i class="fa-solid fa-trophy text-gold"></i> Add Achievement</h3>
+            <div class="form-group">
+              <label for="achievement-title">Title</label>
+              <input type="text" id="achievement-title" required>
+            </div>
+            <div class="form-group">
+              <label for="achievement-description">Description</label>
+              <textarea id="achievement-description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="achievement-image">Image URL (optional)</label>
+              <input type="url" id="achievement-image" placeholder="https://…">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-plus"></i> Add Achievement
+            </button>
+          </form>
+
+          <div class="table-card glass">
+            <table class="data-table">
+              <thead>
+                <tr><th>Title</th><th>Description</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="admin-achievements-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
