@@ -24,11 +24,10 @@
       <nav class="sidebar-nav">
         <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
         <a href="announcements.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
-        <a href="members.html" class="active"><i class="fa-solid fa-users"></i> Members</a>
+        <a href="members.html" class="active"><i class="fa-solid fa-users"></i> Members <span id="nav-msg-badge" class="nav-badge" style="display:none;"></span></a>
         <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
         <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
-        <a href="messages.html"><i class="fa-solid fa-message"></i> Messages <span id="nav-msg-badge" class="nav-badge" style="display:none;"></span></a>
         <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
         <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -57,6 +56,25 @@
 
       <div id="members-grid" class="grid grid-4"></div>
     </main>
+  </div>
+
+  <!-- Inline Chat Modal — opens directly from a member's "Message" button -->
+  <div id="member-chat-overlay" class="member-chat-overlay">
+    <div class="member-chat-modal glass">
+      <div class="chat-header">
+        <button class="chat-back-btn" id="member-chat-close" style="display:block;"><i class="fa-solid fa-arrow-left"></i></button>
+        <div class="avatar-circle" id="member-chat-avatar"></div>
+        <div>
+          <strong id="member-chat-name">—</strong>
+          <span id="member-chat-status" class="chat-partner-status">—</span>
+        </div>
+      </div>
+      <div class="chat-messages" id="member-chat-messages"></div>
+      <form class="chat-input-row" id="member-chat-form">
+        <input type="text" id="member-chat-input" placeholder="Type a message…" maxlength="1000" autocomplete="off" required>
+        <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
   </div>
 
   <button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
