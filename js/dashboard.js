@@ -129,10 +129,19 @@ async function loadMembers(searchTerm = "") {
         <p class="member-status ${isUserOnline(m) ? "text-online" : "text-offline"}">
           ${isUserOnline(m) ? "🟢 Online now" : "⚪ Offline"}
         </p>
-        ${m.uid !== auth.currentUser?.uid ? `<a class="btn btn-outline btn-sm" href="messages.html?to=${m.uid}"><i class="fa-solid fa-message"></i> Message</a>` : ""}
+        ${m.uid !== auth.currentUser?.uid ? `<button type="button" class="btn btn-outline btn-sm chat-member-btn" data-uid="${m.uid}" data-name="${sanitize(m.fullname)}"><i class="fa-solid fa-message"></i> Message</button>` : ""}
       </div>`
     )
     .join("");
+
+  // Wire up "Message" buttons to open the inline chat modal (members.html only)
+  grid.querySelectorAll(".chat-member-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (typeof openMemberChatModal === "function") {
+        openMemberChatModal(btn.dataset.uid, btn.dataset.name);
+      }
+    });
+  });
 }
 
 /* ---------- Birthday Reminders ---------- */
