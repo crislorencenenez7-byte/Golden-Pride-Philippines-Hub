@@ -160,15 +160,16 @@ function toggleCommentThread(announcementId) {
     .doc(announcementId)
     .collection("comments")
     .orderBy("createdAt", "asc")
-    .onSnapshot((snap) => {
-      if (snap.empty) {
-        listEl.innerHTML = `<p class="empty-state small">No comments yet. Be the first!</p>`;
-        return;
-      }
-      listEl.innerHTML = snap.docs
-        .map((d) => {
-          const c = d.data();
-          return `
+    .onSnapshot(
+      (snap) => {
+        if (snap.empty) {
+          listEl.innerHTML = `<p class="empty-state small">No comments yet. Be the first!</p>`;
+          return;
+        }
+        listEl.innerHTML = snap.docs
+          .map((d) => {
+            const c = d.data();
+            return `
           <div class="comment-item">
             <div class="avatar-circle small">${getInitials(c.fullname || "")}</div>
             <div class="comment-body">
@@ -176,10 +177,15 @@ function toggleCommentThread(announcementId) {
               <p>${sanitize(c.text)}</p>
             </div>
           </div>`;
-        })
-        .join("");
-      listEl.scrollTop = listEl.scrollHeight;
-    });
+          })
+          .join("");
+        listEl.scrollTop = listEl.scrollHeight;
+      },
+      (err) => {
+        console.error("Comment thread error:", err);
+        listEl.innerHTML = `<p class="empty-state small">Unable to load comments. Check Firestore Rules.</p>`;
+      }
+    );
 
   openCommentThreads[announcementId] = unsubscribe;
 }

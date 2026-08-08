@@ -55,26 +55,27 @@ function initChatList(myUid) {
   chatListUnsub = db
     .collection(COLLECTIONS.CHATS)
     .where("participants", "array-contains", myUid)
-    .onSnapshot((snap) => {
-      if (snap.empty) {
-        listEl.innerHTML = `<p class="empty-state small">No conversations yet. Search a member above to say hi 👋</p>`;
-        updateNavBadge(0);
-        return;
-      }
+    .onSnapshot(
+      (snap) => {
+        if (snap.empty) {
+          listEl.innerHTML = `<p class="empty-state small">No conversations yet. Search a member above to say hi 👋</p>`;
+          updateNavBadge(0);
+          return;
+        }
 
-      const chats = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => (b.lastTimestamp?.toMillis?.() || 0) - (a.lastTimestamp?.toMillis?.() || 0));
+        const chats = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.lastTimestamp?.toMillis?.() || 0) - (a.lastTimestamp?.toMillis?.() || 0));
 
-      let totalUnread = 0;
+        let totalUnread = 0;
 
-      listEl.innerHTML = chats
-        .map((c) => {
-          const otherUid = c.participants.find((id) => id !== myUid);
-          const otherName = c.participantNames?.[otherUid] || "Member";
-          const unread = c[`unread_${myUid}`] || 0;
-          totalUnread += unread;
-          return `
+        listEl.innerHTML = chats
+          .map((c) => {
+            const otherUid = c.participants.find((id) => id !== myUid);
+            const otherName = c.participantNames?.[otherUid] || "Member";
+            const unread = c[`unread_${myUid}`] || 0;
+            totalUnread += unread;
+            return `
           <div class="chat-list-item ${c.id === activeChatId ? "active" : ""}" data-chat-id="${c.id}" data-other-uid="${otherUid}" data-other-name="${sanitize(otherName)}">
             <div class="avatar-circle">${getInitials(otherName)}</div>
             <div class="chat-list-item-info">
@@ -83,17 +84,22 @@ function initChatList(myUid) {
             </div>
             ${unread > 0 ? `<span class="chat-unread-badge">${unread}</span>` : ""}
           </div>`;
-        })
-        .join("");
+          })
+          .join("");
 
-      updateNavBadge(totalUnread);
+        updateNavBadge(totalUnread);
 
-      listEl.querySelectorAll(".chat-list-item").forEach((item) => {
-        item.addEventListener("click", () => {
-          openChat(item.dataset.chatId, item.dataset.otherUid, item.dataset.otherName);
+        listEl.querySelectorAll(".chat-list-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            openChat(item.dataset.chatId, item.dataset.otherUid, item.dataset.otherName);
+          });
         });
-      });
-    });
+      },
+      (err) => {
+        console.error("Chat list error:", err);
+        listEl.innerHTML = `<p class="empty-state small">Unable to load conversations. Make sure Firestore Rules include the "chats" collection (see README).</p>`;
+      }
+    );
 }
 
 function updateNavBadge(count) {
@@ -201,21 +207,27 @@ function openChat(chatId, otherUid, otherName) {
     .doc(chatId)
     .collection("messages")
     .orderBy("createdAt", "asc")
-    .onSnapshot((snap) => {
-      if (snap.empty) {
-        messagesEl.innerHTML = `<p class="empty-state small">No messages yet. Say hello 👋</p>`;
-        return;
+    .onSnapshot(
+      (snap) => {
+        if (snap.empty) {
+          messagesEl.innerHTML = `<p class="empty-state small">No messages yet. Say hello 👋</p>`;
+          return;
+        }
+        const myUid = auth.currentUser.uid;
+        messagesEl.innerHTML = snap.docs
+          .map((d) => {
+            const m = d.data();
+            const mine = m.senderUid === myUid;
+            return `<div class="chat-bubble-row ${mine ? "mine" : ""}"><div class="chat-bubble">${sanitize(m.text)}</div></div>`;
+          })
+          .join("");
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      },
+      (err) => {
+        console.error("Chat messages error:", err);
+        messagesEl.innerHTML = `<p class="empty-state small">Unable to load messages. Check Firestore Rules.</p>`;
       }
-      const myUid = auth.currentUser.uid;
-      messagesEl.innerHTML = snap.docs
-        .map((d) => {
-          const m = d.data();
-          const mine = m.senderUid === myUid;
-          return `<div class="chat-bubble-row ${mine ? "mine" : ""}"><div class="chat-bubble">${sanitize(m.text)}</div></div>`;
-        })
-        .join("");
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    });
+    );
 
   // Update the status line with live online/offline info for the other member
   const statusEl = document.getElementById("chat-partner-status");
@@ -265,11 +277,20 @@ async function sendMessage(text) {
 /* Live unread badge on every page's sidebar (not just messages.html) */
 auth.onAuthStateChanged((user) => {
   if (!user || document.getElementById("chat-app")) return; // messages.html handles its own badge via initChatList
-  db.collection(COLLECTIONS.CHATS)
-    .where("participants", "array-contains", user.uid)
-    .onSnapshot((snap) => {
-      let total = 0;
-      snap.forEach((d) => (total += d.data()[`unread_${user.uid}`] || 0));
-      updateNavBadge(total);
-    });
+  if (!COLLECTIONS.CHATS) return; // safety guard in case firebase-config.js is out of date
+
+  try {
+    db.collection(COLLECTIONS.CHATS)
+      .where("participants", "array-contains", user.uid)
+      .onSnapshot(
+        (snap) => {
+          let total = 0;
+          snap.forEach((d) => (total += d.data()[`unread_${user.uid}`] || 0));
+          updateNavBadge(total);
+        },
+        (err) => console.error("Unread badge listener error:", err)
+      );
+  } catch (err) {
+    console.error("Unread badge setup error:", err);
+  }
 });

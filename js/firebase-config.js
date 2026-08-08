@@ -30,7 +30,9 @@ const COLLECTIONS = {
   ANNOUNCEMENTS: "announcements",
   EVENTS: "events",
   GALLERY: "gallery",
-  ACHIEVEMENTS: "achievements"
+  ACHIEVEMENTS: "achievements",
+  POLLS: "polls",
+  CHATS: "chats"
 };
 
 // Role constants
