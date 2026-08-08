@@ -444,3 +444,43 @@
   .chat-mobile-open .chat-pane { transform: translateX(0); }
   .chat-back-btn { display: block; }
 }
+
+/* ---------- Inline Member Chat Modal (Members page) ---------- */
+.member-chat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  padding: 16px;
+}
+.member-chat-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.member-chat-modal {
+  width: 100%;
+  max-width: 440px;
+  height: 70vh;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px);
+  transition: transform 0.2s ease;
+}
+.member-chat-overlay.open .member-chat-modal {
+  transform: translateY(0);
+}
+.member-chat-modal .chat-header { flex-shrink: 0; }
+.member-chat-modal .chat-input-row { flex-shrink: 0; }
+.member-chat-modal .chat-messages { flex: 1; }
+
+@media (max-width: 480px) {
+  .member-chat-modal { height: 85vh; max-width: 100%; }
+}
