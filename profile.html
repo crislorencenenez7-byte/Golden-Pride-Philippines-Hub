@@ -29,6 +29,7 @@
         <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
         <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
+        <a href="messages.html"><i class="fa-solid fa-message"></i> Messages <span id="nav-msg-badge" class="nav-badge" style="display:none;"></span></a>
         <a href="profile.html" class="active"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
         <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -78,6 +79,15 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="profile-birthday">Birthday</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-cake-candles"></i>
+              <input type="date" id="profile-birthday">
+            </div>
+            <small style="color:var(--color-gray); font-size:0.78rem;">We'll show a birthday shout-out on the Dashboard for everyone on your special day 🎉</small>
+          </div>
+
           <button type="submit" class="btn btn-primary btn-block">
             <i class="fa-solid fa-floppy-disk"></i> Save Changes
           </button>
@@ -98,5 +108,6 @@
   <script src="js/dashboard.js"></script>
   <script src="js/presence.js"></script>
   <script src="js/notifications.js"></script>
+  <script src="js/messages.js"></script>
 </body>
 </html>
