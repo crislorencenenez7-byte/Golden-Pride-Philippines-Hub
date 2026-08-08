@@ -29,6 +29,7 @@
         <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
         <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
+        <a href="messages.html"><i class="fa-solid fa-message"></i> Messages <span id="nav-msg-badge" class="nav-badge" style="display:none;"></span></a>
         <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
         <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -48,6 +49,8 @@
         <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
         <h1>Welcome, <span class="text-gold user-fullname">Member</span> 👋</h1>
       </div>
+
+      <div id="birthday-banner"></div>
 
       <div class="stats-grid">
         <div class="stat-card glass">
@@ -81,6 +84,8 @@
         <a href="achievements.html" class="dashboard-link-card glass card"><i class="fa-solid fa-trophy"></i><h4>Achievements</h4></a>
       </div>
 
+      <div id="poll-section"></div>
+
       <h2 class="section-title" style="font-size:1.3rem;">Latest Announcement</h2>
       <div id="latest-announcement" class="grid grid-3"></div>
     </main>
@@ -98,5 +103,7 @@
   <script src="js/dashboard.js"></script>
   <script src="js/presence.js"></script>
   <script src="js/notifications.js"></script>
+  <script src="js/messages.js"></script>
+  <script src="js/polls.js"></script>
 </body>
 </html>
