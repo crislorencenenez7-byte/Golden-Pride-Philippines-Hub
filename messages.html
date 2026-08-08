@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Events | Golden Pride Hub</title>
+  <title>Messages | Golden Pride Hub</title>
 
   <link rel="icon" href="assets/logo.png">
   <link rel="stylesheet" href="css/style.css">
@@ -25,10 +25,10 @@
         <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
         <a href="announcements.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
         <a href="members.html"><i class="fa-solid fa-users"></i> Members</a>
-        <a href="events.html" class="active"><i class="fa-solid fa-calendar-days"></i> Events</a>
+        <a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a>
         <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="achievements.html"><i class="fa-solid fa-trophy"></i> Achievements</a>
-        <a href="messages.html"><i class="fa-solid fa-message"></i> Messages <span id="nav-msg-badge" class="nav-badge" style="display:none;"></span></a>
+        <a href="messages.html" class="active"><i class="fa-solid fa-message"></i> Messages</a>
         <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="admin.html" class="admin-only" style="display:none;"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
         <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -45,18 +45,46 @@
     <main class="main-content">
       <div class="topbar">
         <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
-        <h1>Events</h1>
+        <h1>Messages</h1>
       </div>
 
-      <h2 class="section-title" style="font-size:1.2rem;">Upcoming Events</h2>
-      <div id="upcoming-events" class="grid grid-2" style="margin-bottom:36px;"></div>
+      <div class="chat-app glass" id="chat-app">
+        <div class="chat-list-pane" id="chat-list-pane">
+          <div class="chat-list-header">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="chat-member-search" placeholder="Start a chat — search members…">
+            </div>
+          </div>
+          <div id="chat-member-results" class="chat-member-results"></div>
+          <div id="chat-list" class="chat-list"><p class="empty-state small">Loading conversations…</p></div>
+        </div>
 
-      <h2 class="section-title" style="font-size:1.2rem;">Past Events</h2>
-      <div id="past-events" class="grid grid-2"></div>
+        <div class="chat-pane" id="chat-pane">
+          <div class="chat-empty-state" id="chat-empty-state">
+            <i class="fa-regular fa-comments"></i>
+            <p>Select a member to start chatting.</p>
+          </div>
+
+          <div class="chat-active" id="chat-active" style="display:none;">
+            <div class="chat-header">
+              <button class="chat-back-btn" id="chat-back-btn"><i class="fa-solid fa-arrow-left"></i></button>
+              <div class="avatar-circle" id="chat-partner-avatar"></div>
+              <div>
+                <strong id="chat-partner-name">—</strong>
+                <span id="chat-partner-status" class="chat-partner-status">—</span>
+              </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <form class="chat-input-row" id="chat-input-form">
+              <input type="text" id="chat-input" placeholder="Type a message…" maxlength="1000" autocomplete="off" required>
+              <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
-
-  <button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
