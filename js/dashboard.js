@@ -27,6 +27,7 @@ auth.onAuthStateChanged(async (user) => {
   }
 
   loadDashboardStats();
+  checkBirthdays();
 });
 
 /* ---------- Dashboard Summary Cards ---------- */
@@ -128,9 +129,43 @@ async function loadMembers(searchTerm = "") {
         <p class="member-status ${isUserOnline(m) ? "text-online" : "text-offline"}">
           ${isUserOnline(m) ? "🟢 Online now" : "⚪ Offline"}
         </p>
+        ${m.uid !== auth.currentUser?.uid ? `<a class="btn btn-outline btn-sm" href="messages.html?to=${m.uid}"><i class="fa-solid fa-message"></i> Message</a>` : ""}
       </div>`
     )
     .join("");
+}
+
+/* ---------- Birthday Reminders ---------- */
+async function checkBirthdays() {
+  const banner = document.getElementById("birthday-banner");
+  if (!banner) return; // only runs on dashboard.html
+
+  try {
+    const snap = await db.collection(COLLECTIONS.USERS).get();
+    const today = new Date();
+    const todayKey = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const celebrants = snap.docs
+      .map((d) => d.data())
+      .filter((m) => m.birthday && m.birthday.slice(5) === todayKey); // birthday stored as YYYY-MM-DD
+
+    if (celebrants.length === 0) {
+      banner.innerHTML = "";
+      return;
+    }
+
+    banner.innerHTML = `
+      <div class="birthday-banner glass fade-in">
+        <span class="birthday-emoji">🎉🎂</span>
+        <div>
+          <strong>Happy Birthday, ${celebrants.map((m) => sanitize(m.fullname)).join(", ")}!</strong>
+          <p>Wishing you a wonderful day from all of us at Golden Pride Philippines 🎈</p>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    banner.innerHTML = "";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -318,6 +353,9 @@ if (profileForm) {
         document.getElementById("profile-fullname").value = data.fullname || "";
         document.getElementById("profile-email").value = data.email || "";
         document.getElementById("profile-photo").src = data.photoURL || "";
+        if (document.getElementById("profile-birthday")) {
+          document.getElementById("profile-birthday").value = data.birthday || "";
+        }
       });
   });
 
@@ -327,12 +365,13 @@ if (profileForm) {
     if (!user) return;
 
     const fullname = document.getElementById("profile-fullname").value.trim();
+    const birthday = document.getElementById("profile-birthday")?.value || "";
     const submitBtn = profileForm.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.classList.add("btn-loading");
 
     try {
-      await db.collection(COLLECTIONS.USERS).doc(user.uid).update({ fullname });
+      await db.collection(COLLECTIONS.USERS).doc(user.uid).update({ fullname, birthday });
       await user.updateProfile({ displayName: fullname });
       showToast("Profile updated successfully!", "success");
     } catch (err) {

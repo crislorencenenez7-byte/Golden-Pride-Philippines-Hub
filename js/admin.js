@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAdminGalleryTable();
   loadAdminAchievementsTable();
   bindImagePreviews();
+  bindPollForm();
+  loadAdminPollsTable();
 });
 
 /* ---------- Image Upload Helper ----------
@@ -466,4 +468,107 @@ async function deleteAchievement(id) {
   await db.collection(COLLECTIONS.ACHIEVEMENTS).doc(id).delete();
   showToast("Achievement deleted.", "success");
   loadAdminAchievementsTable();
+}
+
+/* ---------- Polls ---------- */
+document.addEventListener("click", (e) => {
+  if (e.target.id === "poll-add-option" || e.target.closest("#poll-add-option")) {
+    const wrap = document.getElementById("poll-options-wrap");
+    const count = wrap.querySelectorAll(".poll-option-input").length;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "poll-option-input";
+    input.placeholder = `Option ${count + 1}`;
+    wrap.appendChild(input);
+  }
+});
+
+function bindPollForm() {
+  const form = document.getElementById("poll-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const question = document.getElementById("poll-question").value.trim();
+    const optionInputs = [...document.querySelectorAll(".poll-option-input")];
+    const options = optionInputs.map((inp, i) => ({ id: `opt${i}`, text: inp.value.trim() })).filter((o) => o.text);
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    if (!question || options.length < 2) {
+      showToast("Add a question and at least 2 options.", "warning");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add("btn-loading");
+
+    try {
+      await db.collection(COLLECTIONS.POLLS).add({
+        question,
+        options,
+        active: true,
+        createdBy: currentUserData?.fullname || "Admin",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast("Poll published.", "success");
+      form.reset();
+      // Reset options back to just 2 blank inputs
+      document.getElementById("poll-options-wrap").innerHTML = `
+        <input type="text" class="poll-option-input" placeholder="Option 1" required>
+        <input type="text" class="poll-option-input" placeholder="Option 2" required>`;
+      loadAdminPollsTable();
+    } catch (err) {
+      showToast(err.message || "Failed to publish poll.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("btn-loading");
+    }
+  });
+}
+
+async function loadAdminPollsTable() {
+  const tbody = document.getElementById("admin-polls-table");
+  if (!tbody) return;
+
+  const snap = await db.collection(COLLECTIONS.POLLS).orderBy("createdAt", "desc").get();
+
+  if (snap.empty) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No polls yet.</td></tr>`;
+    return;
+  }
+
+  const rows = await Promise.all(
+    snap.docs.map(async (doc) => {
+      const d = doc.data();
+      const votesSnap = await db.collection(COLLECTIONS.POLLS).doc(doc.id).collection("votes").get();
+      return `
+      <tr>
+        <td>${sanitize(d.question)}</td>
+        <td>${d.active ? '<span class="role-badge badge-member">Active</span>' : '<span class="role-badge">Closed</span>'}</td>
+        <td>${votesSnap.size}</td>
+        <td class="table-actions">
+          <button class="btn-icon" onclick="togglePollActive('${doc.id}', ${d.active})" title="${d.active ? "Close poll" : "Reopen poll"}">
+            <i class="fa-solid ${d.active ? "fa-lock" : "fa-lock-open"}"></i>
+          </button>
+          <button class="btn-icon" onclick="deletePoll('${doc.id}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>`;
+    })
+  );
+
+  tbody.innerHTML = rows.join("");
+}
+
+async function togglePollActive(id, currentlyActive) {
+  await db.collection(COLLECTIONS.POLLS).doc(id).update({ active: !currentlyActive });
+  showToast(currentlyActive ? "Poll closed." : "Poll reopened.", "success");
+  loadAdminPollsTable();
+}
+
+async function deletePoll(id) {
+  const ok = await confirmDialog("Delete this poll? All votes will be lost.");
+  if (!ok) return;
+  await db.collection(COLLECTIONS.POLLS).doc(id).delete();
+  showToast("Poll deleted.", "success");
+  loadAdminPollsTable();
 }
