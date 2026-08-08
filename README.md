@@ -77,7 +77,17 @@ service cloud.firestore {
 
     match /announcements/{docId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      // Admins can edit everything; any signed-in member can update ONLY
+      // the likedBy array (for the heart/like button) without admin rights.
+      allow update: if isAdmin() ||
+        (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy']));
+
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+        allow delete: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      }
     }
 
     match /events/{docId} {
@@ -99,6 +109,29 @@ service cloud.firestore {
     match /achievements/{docId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
+    }
+
+    match /polls/{pollId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+
+      match /votes/{uid} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && request.auth.uid == uid;
+        allow delete: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      }
+    }
+
+    match /chats/{chatId} {
+      allow read, update: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participants;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create: if isSignedIn() &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants &&
+          request.resource.data.senderUid == request.auth.uid;
+      }
     }
   }
 }
@@ -123,6 +156,10 @@ New accounts register with role `member` by default. To make yourself an admin:
 - **Event RSVP/Attendance** — members can RSVP to upcoming events; admins can view the full attendee list per event from the Admin Panel
 - **Online/Offline presence** — members list shows a live green/gray dot based on a Firestore heartbeat (updates roughly every 60s; a member is shown offline after ~2 minutes of inactivity)
 - **In-app notifications** — a bell icon shows unread announcement count in real time, with an optional browser desktop notification if the member grants permission. This works while the browser tab is open (including in the background) but **cannot** deliver notifications when the browser is fully closed — true "push while closed" requires Firebase Cloud Messaging + a Cloud Function on the paid Blaze plan
+- **Comments & reactions** — members can like (heart) announcements and post real-time comment threads under each one
+- **Direct messaging** — 1-on-1 real-time chat between any two members (`messages.html`), with an unread-count badge in the sidebar visible from every page; start a chat from a member's card on the Members page or from the search bar inside Messages
+- **Polls/surveys** — admins publish a poll with 2+ options from the Admin Panel's Polls tab; members vote (and can change their vote) from a live-updating poll card on the Dashboard, with results shown as percentage bars
+- **Birthday reminders** — members set their birthday on their Profile page; on that date, an automatic "Happy Birthday" banner appears on the Dashboard for everyone to see
 - Search, filter, and pagination on Announcements; search on Members
 - Responsive glassmorphism UI with dark mode aesthetic, mobile navigation, and scroll-to-top
 - Toast notifications and confirmation dialogs for all destructive actions
